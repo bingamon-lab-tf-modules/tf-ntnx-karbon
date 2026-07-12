@@ -30,6 +30,7 @@ No modules.
 |------|------|
 | [nutanix_karbon_cluster.cluster](https://registry.terraform.io/providers/nutanix/nutanix/latest/docs/resources/karbon_cluster) | resource |
 | [nutanix_karbon_private_registry.registry](https://registry.terraform.io/providers/nutanix/nutanix/latest/docs/resources/karbon_private_registry) | resource |
+| [nutanix_karbon_cluster_kubeconfig.cluster](https://registry.terraform.io/providers/nutanix/nutanix/latest/docs/data-sources/karbon_cluster_kubeconfig) | data source |
 | [nutanix_karbon_clusters.existing](https://registry.terraform.io/providers/nutanix/nutanix/latest/docs/data-sources/karbon_clusters) | data source |
 | [nutanix_karbon_private_registries.existing](https://registry.terraform.io/providers/nutanix/nutanix/latest/docs/data-sources/karbon_private_registries) | data source |
 
