@@ -160,6 +160,7 @@ in
         enable = true;
         excludes = [
           "module/README.md"
+          "module/tests/README.md"
         ];
         settings = {
           configuration = {
