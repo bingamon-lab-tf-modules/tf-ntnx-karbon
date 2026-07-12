@@ -1,3 +1,9 @@
+variable "enable_data_lookups" {
+  description = "Enable data source lookups for existing clusters and registries"
+  type        = bool
+  default     = false
+}
+
 variable "clusters" {
   description = "Map of Karbon Kubernetes clusters to create"
   type = map(object({
@@ -97,6 +103,44 @@ variable "clusters" {
     }))
   }))
   default = {}
+
+  validation {
+    condition = alltrue([
+      for k, v in var.clusters : v.name != null && v.name != ""
+    ])
+    error_message = "name is required for all Karbon clusters."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.clusters : v.version != null && v.version != ""
+    ])
+    error_message = "version is required for all Karbon clusters."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.clusters : contains([1, 3], v.master_node_pool.num_instances)
+    ])
+    error_message = "master_node_pool.num_instances must be 1 (dev) or 3 (HA)."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.clusters : contains([1, 3], v.etcd_node_pool.num_instances)
+    ])
+    error_message = "etcd_node_pool.num_instances must be 1 (dev) or 3 (HA)."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.clusters : (
+        v.cni_config.calico_config != null ||
+        v.cni_config.flannel_config != null
+      )
+    ])
+    error_message = "Either calico_config or flannel_config must be specified in cni_config."
+  }
 }
 
 variable "private_registries" {
@@ -110,4 +154,18 @@ variable "private_registries" {
     password = optional(string)
   }))
   default = {}
+
+  validation {
+    condition = alltrue([
+      for k, v in var.private_registries : v.name != null && v.name != ""
+    ])
+    error_message = "name is required for all Karbon private registries."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.private_registries : v.url != null && v.url != ""
+    ])
+    error_message = "url is required for all Karbon private registries."
+  }
 }

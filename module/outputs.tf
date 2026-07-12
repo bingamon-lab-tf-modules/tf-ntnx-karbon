@@ -25,6 +25,21 @@ output "cluster_ids" {
   }
 }
 
+output "cluster_kubeconfigs" {
+  description = "Map of cluster keys to their kubeconfig"
+  value = {
+    for k, v in nutanix_karbon_cluster.cluster : k => v.kubeconfig
+  }
+  sensitive = true
+}
+
+output "cluster_endpoints" {
+  description = "Map of cluster keys to their Kubernetes API server endpoints"
+  value = {
+    for k, v in nutanix_karbon_cluster.cluster : k => v.kubeapi_server_ipv4_address
+  }
+}
+
 output "registries" {
   description = "Private registry details"
   value = {
@@ -42,6 +57,16 @@ output "registry_ids" {
   value = {
     for k, v in nutanix_karbon_private_registry.registry : k => v.uuid
   }
+}
+
+output "existing_cluster_ids" {
+  description = "Map of existing (data-lookup) Karbon cluster names to UUIDs. Populated only when enable_data_lookups is true."
+  value       = local.cluster_id_by_name
+}
+
+output "existing_registry_endpoints" {
+  description = "Map of existing (data-lookup) private registry names to endpoints. Populated only when enable_data_lookups is true."
+  value       = local.registry_endpoint_by_name
 }
 
 output "karbon_summary" {
