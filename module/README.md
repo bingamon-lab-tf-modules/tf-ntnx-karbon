@@ -53,6 +53,7 @@ No modules.
 | <a name="output_existing_cluster_ids"></a> [existing\_cluster\_ids](#output\_existing\_cluster\_ids) | Map of existing (data-lookup) Karbon cluster names to UUIDs. Populated only when enable\_data\_lookups is true. |
 | <a name="output_existing_registry_endpoints"></a> [existing\_registry\_endpoints](#output\_existing\_registry\_endpoints) | Map of existing (data-lookup) private registry names to endpoints. Populated only when enable\_data\_lookups is true. |
 | <a name="output_karbon_summary"></a> [karbon\_summary](#output\_karbon\_summary) | Summary of Karbon resources |
+| <a name="output_outputs"></a> [outputs](#output\_outputs) | Aggregate of all module outputs (spec §7.6 contract, consumed by the landing zone as module.<x>.outputs). |
 | <a name="output_registries"></a> [registries](#output\_registries) | Private registry details |
 | <a name="output_registry_ids"></a> [registry\_ids](#output\_registry\_ids) | Map of registry names to UUIDs |
 <!-- END_TF_DOCS -->

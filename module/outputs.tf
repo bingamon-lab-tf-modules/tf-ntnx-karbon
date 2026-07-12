@@ -1,21 +1,7 @@
 output "clusters" {
   description = "Karbon cluster details"
-  value = {
-    for k, v in nutanix_karbon_cluster.cluster : k => {
-      name               = v.name
-      version            = v.version
-      status             = v.status
-      kubeconfig         = local.kubeconfig_by_cluster[k]
-      worker_node_pool   = v.worker_node_pool
-      etcd_node_pool     = v.etcd_node_pool
-      master_node_pool   = v.master_node_pool
-      storage_class_name = one(v.storage_class_config).name
-      cni_type           = length(v.cni_config[0].calico_config) > 0 ? "calico" : "flannel"
-      pod_ipv4_cidr      = v.cni_config[0].pod_ipv4_cidr
-      service_ipv4_cidr  = v.cni_config[0].service_ipv4_cidr
-    }
-  }
-  sensitive = true
+  value       = local.out_clusters
+  sensitive   = true
 }
 
 output "cluster_ids" {
@@ -69,16 +55,37 @@ output "existing_registry_endpoints" {
 
 output "karbon_summary" {
   description = "Summary of Karbon resources"
+  value       = local.out_karbon_summary
+}
+
+# ---------------------------------------------------------------------------
+# Aggregate output (spec §7.6 contract)
+# ---------------------------------------------------------------------------
+output "outputs" {
+  description = "Aggregate of all module outputs (spec §7.6 contract, consumed by the landing zone as module.<x>.outputs)."
+  sensitive   = true
   value = {
-    total_clusters      = length(nutanix_karbon_cluster.cluster)
-    total_registries    = length(nutanix_karbon_private_registry.registry)
-    clusters_by_version = { for v in distinct([for c in nutanix_karbon_cluster.cluster : c.version]) : v => length([for c in nutanix_karbon_cluster.cluster : c if c.version == v]) }
-    clusters_by_cni = {
-      calico  = length([for c in nutanix_karbon_cluster.cluster : c if length(c.cni_config[0].calico_config) > 0])
-      flannel = length([for c in nutanix_karbon_cluster.cluster : c if length(c.cni_config[0].calico_config) == 0])
+    clusters = local.out_clusters
+    cluster_ids = {
+      for k, v in nutanix_karbon_cluster.cluster : k => v.id
     }
-    total_worker_nodes = length(nutanix_karbon_cluster.cluster) == 0 ? 0 : sum([for c in nutanix_karbon_cluster.cluster : c.worker_node_pool[0].num_instances])
-    total_master_nodes = length(nutanix_karbon_cluster.cluster) == 0 ? 0 : sum([for c in nutanix_karbon_cluster.cluster : c.master_node_pool[0].num_instances])
-    total_etcd_nodes   = length(nutanix_karbon_cluster.cluster) == 0 ? 0 : sum([for c in nutanix_karbon_cluster.cluster : c.etcd_node_pool[0].num_instances])
+    cluster_kubeconfigs = local.kubeconfig_by_cluster
+    cluster_endpoints = {
+      for k, v in nutanix_karbon_cluster.cluster : k => v.kubeapi_server_ipv4_address
+    }
+    registries = {
+      for k, v in nutanix_karbon_private_registry.registry : k => {
+        name     = v.name
+        endpoint = v.endpoint
+        url      = v.url
+        port     = v.port
+      }
+    }
+    registry_ids = {
+      for k, v in nutanix_karbon_private_registry.registry : k => v.id
+    }
+    existing_cluster_ids        = local.cluster_id_by_name
+    existing_registry_endpoints = local.registry_endpoint_by_name
+    karbon_summary              = local.out_karbon_summary
   }
 }
